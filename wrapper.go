@@ -23,11 +23,11 @@ func (wr Wrapper) handleError(r *http.Request, rawErr any) Response {
 
 func (wr Wrapper) Wrap(handler func(r *http.Request) (Response, error)) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var err error
+		var err any
 		var res Response
 
 		defer func() {
-			if recoverErr := recover(); err != nil {
+			if recoverErr := recover(); recoverErr != nil {
 				res = wr.handleError(r, recoverErr)
 			} else if err != nil {
 				res = wr.handleError(r, err)
