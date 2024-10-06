@@ -5,18 +5,18 @@ import (
 )
 
 type Wrapper struct {
-	SupportedErrors map[error]func(r *http.Request) Response
-	HandleError     func(err any) Response
+	SupportedErrors map[error]func(r *http.Request, err error) Response
+	HandleError     func(r *http.Request, err any) Response
 }
 
 func (wr Wrapper) handleError(r *http.Request, rawErr any) Response {
 	if err, ok := rawErr.(error); ok && wr.SupportedErrors != nil {
 		if handler, ok := wr.SupportedErrors[err]; ok {
-			return handler(r)
+			return handler(r, err)
 		}
 	}
 	if wr.HandleError != nil {
-		return wr.HandleError(rawErr)
+		return wr.HandleError(r, rawErr)
 	}
 	return nil
 }
